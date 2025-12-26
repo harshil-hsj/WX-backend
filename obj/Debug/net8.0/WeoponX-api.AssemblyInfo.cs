@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WeoponX-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80ffa1a887b845d91ba6dbdcaebd1a5329662a29")]
 [assembly: System.Reflection.AssemblyProductAttribute("WeoponX-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WeoponX-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

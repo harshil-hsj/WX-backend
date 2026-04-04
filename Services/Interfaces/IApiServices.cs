@@ -3,5 +3,8 @@ namespace WeoponX.Services;
 public interface IApiServices
 {
     Task<List<User>> GetAllUsersAsync();
-    Task SaveEmailOtpAsync(WeoponX.Models.EmailOtp emailOtp);
+    Task SaveEmailOtpAsync(EmailOtp emailOtp);
+    Task<EmailOtp> GetLatestEmailOtpAsync(string email);
+    string GenerateJwtToken(string email, DateTime expiresAtUtc);
+    Task<bool> UserExistsAsync(string email);
 }

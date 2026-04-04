@@ -41,7 +41,8 @@ public class ApiServices : IApiServices
     public string GenerateJwtToken(string email, DateTime expiresAtUtc)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+        var secret = _configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT secret is not configured.");
+        var key = Encoding.ASCII.GetBytes(secret);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]

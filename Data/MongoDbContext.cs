@@ -4,6 +4,7 @@ public class MongoDbContext
 {
     private readonly IMongoDatabase _database;
     public IMongoCollection<User> Users { get; }
+    public IMongoCollection<EmailOtp> EmailOtps { get; }
 
     public MongoDbContext(IConfiguration config)
     {
@@ -16,5 +17,6 @@ public class MongoDbContext
         var client = new MongoClient(connectionString);
         _database = client.GetDatabase(databaseName);
         Users = _database.GetCollection<User>("Users");
+        EmailOtps = _database.GetCollection<EmailOtp>("EmailOtps");
     }
 }

@@ -5,7 +5,7 @@ namespace WeoponX.Services;
 
 public class ApiServices : IApiServices
 {
-   private readonly MongoDbContext _db;
+    private readonly MongoDbContext _db;
 
     public ApiServices(MongoDbContext db)
     {
@@ -15,8 +15,13 @@ public class ApiServices : IApiServices
     public async Task<List<User>> GetAllUsersAsync()
     {
         return await _db.Users
-    .Find(_ => true)
-    .Project<User>(Builders<User>.Projection.Exclude("_id"))
-    .ToListAsync();
+            .Find(_ => true)
+            .Project<User>(Builders<User>.Projection.Exclude("_id"))
+            .ToListAsync();
+    }
+
+    public async Task SaveEmailOtpAsync(WeoponX.Models.EmailOtp emailOtp)
+    {
+        await _db.EmailOtps.InsertOneAsync(emailOtp);
     }
 }

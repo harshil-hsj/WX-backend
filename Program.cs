@@ -1,4 +1,5 @@
 using WeoponX.Services;
+using WeoponX.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,9 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+// Use custom JWT validation middleware
+app.UseMiddleware<Middleware>();
 
 app.MapControllers();
 

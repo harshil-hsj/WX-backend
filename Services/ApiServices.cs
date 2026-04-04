@@ -1,15 +1,21 @@
 using MongoDB.Driver;
 using WeoponX.Models;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using  Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 namespace WeoponX.Services;
 
 public class ApiServices : IApiServices
 {
     private readonly MongoDbContext _db;
 
-    public ApiServices(MongoDbContext db)
+    private readonly IConfiguration _configuration;
+
+    public ApiServices(MongoDbContext db, IConfiguration configuration)
     {
         _db = db;
+        _configuration = configuration;
     }
 
     public async Task<List<User>> GetAllUsersAsync()
@@ -20,8 +26,40 @@ public class ApiServices : IApiServices
             .ToListAsync();
     }
 
-    public async Task SaveEmailOtpAsync(WeoponX.Models.EmailOtp emailOtp)
+    public async Task SaveEmailOtpAsync(EmailOtp emailOtp)
     {
         await _db.EmailOtps.InsertOneAsync(emailOtp);
+    }
+
+    public async Task<EmailOtp> GetLatestEmailOtpAsync(string email)
+    {
+        var filter = Builders<EmailOtp>.Filter.Eq(e => e.Email, email);
+        var sort = Builders<EmailOtp>.Sort.Descending(e => e.SentAtUtc);
+        return await _db.EmailOtps.Find(filter).Sort(sort).FirstOrDefaultAsync();
+    }
+
+    public string GenerateJwtToken(string email, DateTime expiresAtUtc)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Email, email)
+            }),
+            Expires = expiresAtUtc,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+               SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    public async Task<bool> UserExistsAsync(string email)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Email, email);
+        return await _db.Users.Find(filter).AnyAsync();
     }
 }

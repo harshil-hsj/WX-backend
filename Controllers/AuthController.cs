@@ -64,4 +64,31 @@ public class AuthController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("verifyOtp")]
+    public async Task<IActionResult> VerifyOtp([FromQuery] string email, [FromQuery] int otp)
+    {
+        // Check if user exists
+        bool userExists = await _apiServices.UserExistsAsync(email);
+
+        var latestOtp = await _apiServices.GetLatestEmailOtpAsync(email);
+
+        if (latestOtp == null)
+            return NotFound(new { message = "OTP expired. Try requesting a new one.", userExists });
+
+        // Check OTP match
+        if (latestOtp.Otp != otp)
+            return StatusCode(403, new { message = "Invalid OTP.", userExists });
+
+        var expiry = DateTime.UtcNow.AddDays(7); // token valid for 7 days
+        var token = _apiServices.GenerateJwtToken(email, expiry);
+        var response = new OtpVerificationResponseDto
+        {
+            Message = "OTP verified successfully.",
+            AuthToken = token,
+            ExpiresAtUtc = expiry,
+            UserExists = userExists
+        };
+        return Ok(response);
+    }
 }

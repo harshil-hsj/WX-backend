@@ -4,9 +4,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using  Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using WeoponX.DTO;
 namespace WeoponX.Services;
 
-public class ApiServices : IApiServices
+public class ApiServices : IApiServices 
 {
     private readonly MongoDbContext _db;
 
@@ -63,4 +64,53 @@ public class ApiServices : IApiServices
         var filter = Builders<User>.Filter.Eq(u => u.Email, email);
         return await _db.Users.Find(filter).AnyAsync();
     }
+
+    public async Task SaveEmailLogAsync(EmailLog emailLog)
+    {
+        await _db.EmailLogs.InsertOneAsync(emailLog);
+    }
+
+     public async Task<UserDto> CreateUserFromDtoAsync(UserDto userDto)
+    {
+        // Check if user with the same email exists (generic helper)
+        var filter = Builders<User>.Filter.Eq(u => u.Email, userDto.Email);
+        bool exists = await MongoHelper.ExistsAsync(_db, filter);
+        if (exists)
+        {
+            throw new InvalidOperationException("A user with this email already exists.");
+        }
+
+        // Convert DTO to Model
+        var user = new User
+        {
+            Email = userDto.Email,
+            Username = userDto.Username,
+            Auth = userDto.Auth,
+            Profile = userDto.Profile,
+            Fitness = userDto.Fitness,
+            Health = userDto.Health,
+            Subscription = userDto.Subscription,
+            Progress = userDto.Progress,
+            Settings = userDto.Settings,
+            Meta = userDto.Meta
+        };
+        await MongoHelper.InsertAsync(_db, user);
+
+        var resultDto = new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Username = user.Username,
+            Auth = user.Auth,
+            Profile = user.Profile,
+            Fitness = user.Fitness,
+            Health = user.Health,
+            Subscription = user.Subscription,
+            Progress = user.Progress,
+            Settings = user.Settings,
+            Meta = user.Meta
+        };
+        return resultDto;
+    }
+
 }

@@ -46,14 +46,23 @@ public class AuthController : ControllerBase
         }
 
         // Prepare EmailOtp model for MongoDB (to be saved later)
+        var now = DateTime.UtcNow;
         var emailOtp = new EmailOtp
         {
             Email = email,
             Otp = otp,
-            SentAtUtc = DateTime.UtcNow
+            SentAtUtc = now
         };
         await _apiServices.SaveEmailOtpAsync(emailOtp);
-        
+
+        // Log email and message to EmailLogs collection
+        var emailLog = new EmailLog
+        {
+            Email = email,
+            Message = message.Body,
+            SentAtUtc = now
+        };
+        await _apiServices.SaveEmailLogAsync(emailLog);
 
         // Prepare response DTO
         var response = new EmailOtpResponseDto

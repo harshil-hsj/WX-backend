@@ -10,4 +10,5 @@ public interface IApiServices
     Task<bool> UserExistsAsync(string email);
     Task SaveEmailLogAsync(EmailLog emailLog);
     Task<UserDto> CreateUserFromDtoAsync(UserDto userDto);
+    Task<UserDto> PatchUserAsync(string id, UserDto patchDto);
 }

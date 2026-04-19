@@ -40,6 +40,21 @@ public class UsersController : ControllerBase
             return BadRequest(ApiResponse<UserDto>.Fail(ex.Message));
         }
     }
+
+    [HttpPatch]
+    [Route("patchUser/{id}")]
+    public async Task<IActionResult> PatchUser(string id, [FromBody] DTO.UserDto patchDto)
+    {
+        try
+        {
+            var updatedUser = await _apiService.PatchUserAsync(id, patchDto);
+            return Ok(DTO.ApiResponse<DTO.UserDto>.Ok(updatedUser, "User updated successfully."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(DTO.ApiResponse<DTO.UserDto>.Fail(ex.Message));
+        }
+    }
 }
 
 // using Microsoft.AspNetCore.Mvc;

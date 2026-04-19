@@ -113,4 +113,43 @@ public class ApiServices : IApiServices
         return resultDto;
     }
 
+    public async Task<UserDto> PatchUserAsync(string id, UserDto patchDto)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Id, id);
+        var user = await _db.Users.Find(filter).FirstOrDefaultAsync();
+        if (user == null)
+            throw new InvalidOperationException("User not found.");
+
+        // Overlap only non-null fields from patchDto to user
+        if (patchDto.Email != null) user.Email = patchDto.Email;
+        // if (patchDto.PasswordHash != null) user.PasswordHash = patchDto.PasswordHash;
+        if (patchDto.Username != null) user.Username = patchDto.Username;
+        if (patchDto.Auth != null) user.Auth = patchDto.Auth;
+        if (patchDto.Profile != null) user.Profile = patchDto.Profile;
+        if (patchDto.Fitness != null) user.Fitness = patchDto.Fitness;
+        if (patchDto.Health != null) user.Health = patchDto.Health;
+        if (patchDto.Subscription != null) user.Subscription = patchDto.Subscription;
+        if (patchDto.Progress != null) user.Progress = patchDto.Progress;
+        if (patchDto.Settings != null) user.Settings = patchDto.Settings;
+        if (patchDto.Meta != null) user.Meta = patchDto.Meta;
+
+        await _db.Users.ReplaceOneAsync(filter, user);
+
+        return new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email,
+            // PasswordHash = user.PasswordHash,
+            Username = user.Username,
+            Auth = user.Auth,
+            Profile = user.Profile,
+            Fitness = user.Fitness,
+            Health = user.Health,
+            Subscription = user.Subscription,
+            Progress = user.Progress,
+            Settings = user.Settings,
+            Meta = user.Meta
+        };
+    }
+
 }

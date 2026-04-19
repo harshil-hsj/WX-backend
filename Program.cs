@@ -3,6 +3,8 @@ using WeoponX.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// This project is a .NET Core Web API for managing weapons and related data.
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers() .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add( new System.Text.Json.Serialization.JsonStringEnumConverter() ); });

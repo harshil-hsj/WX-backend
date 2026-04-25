@@ -16,7 +16,8 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Route("getAllUsers")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult>
+ GetAll()
     {
         var users = await _apiService.GetAllUsersAsync();
         return Ok(users);
@@ -24,7 +25,8 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [Route("addUser")]
-    public async Task<IActionResult> AddUser([FromBody] UserDto userDto)
+    public async Task<IActionResult>
+ AddUser([FromBody] UserDto userDto)
     {
         try
         {
@@ -43,41 +45,24 @@ public class UsersController : ControllerBase
 
     [HttpPatch]
     [Route("patchUser/{id}")]
-    public async Task<IActionResult> PatchUser(string id, [FromBody] DTO.UserDto patchDto)
+    public async Task<IActionResult>
+ PatchUser(string id, [FromBody] DTO.UserDto patchDto)
     {
         try
         {
             var updatedUser = await _apiService.PatchUserAsync(id, patchDto);
             return Ok(DTO.ApiResponse<DTO.UserDto>.Ok(updatedUser, "User updated successfully."));
         }
+        catch (KeyNotFoundException ex)
+        {
+            // User not found scenario
+            return NotFound(DTO.ApiResponse<DTO.UserDto>.Fail(ex.Message, 404));
+        }
         catch (Exception ex)
         {
-            return BadRequest(DTO.ApiResponse<DTO.UserDto>.Fail(ex.Message));
+            // Catch any other unexpected exceptions and return a generic error
+            // In a real application, you might want more specific error handling or logging here.
+            return StatusCode(StatusCodes.Status500InternalServerError, DTO.ApiResponse<DTO.UserDto>.Fail("An unexpected error occurred while updating the user.", 500));
         }
     }
 }
-
-// using Microsoft.AspNetCore.Mvc;
-// using WeoponX.Services;
-
-// namespace WeoponX.Controllers;
-
-// [ApiController]
-// [Route("users/")]
-// public class UsersController : ControllerBase
-// {
-//     private readonly IApiServices _userService;
-//     public UsersController(IApiServices userService)
-//     {
-//         _userService = userService;
-//     }
-
-//     [HttpGet]
-//     [Route("getAllUsers")]
-//     public async Task<IActionResult> GetAll()
-//     {
-//         var users = await _userService.GetAllUsersAsync();
-//         return Ok(users);
-//     }
-
-// }
